@@ -1,0 +1,121 @@
+# -----------------------------------------------------------------------------
+# 容器编排配置（Docker Compose）
+# 本文件定义旅游信息系统的数据库、后端与前端服务拓扑，确保部署一致性，
+# 并通过健康检查与网络隔离维持运行稳定与可观测性。
+# -----------------------------------------------------------------------------
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: zunyi_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    command: >
+      --mysql-native-password=ON
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --init-connect='SET NAMES utf8mb4;'
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./datebase/zunyi_tourism.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./backend/migrations/001_auth_security.sql:/docker-entrypoint-initdb.d/900-auth-security.sql:ro
+      - ./backend/migrations/002_content_import_compat.sql:/docker-entrypoint-initdb.d/910-content-compat.sql:ro
+      - ./backend/migrations/003_restore_public_user.sql:/docker-entrypoint-initdb.d/920-public-user.sql:ro
+      - ./backend/migrations/004_route_and_submission_audit.sql:/docker-entrypoint-initdb.d/930-route-submission.sql:ro
+    networks:
+      - zunyi_net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: zunyi_db_admin
+    restart: unless-stopped
+    profiles: ["tools"]
+    env_file:
+      - .env
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "127.0.0.1:${PMA_PORT:-8080}:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zunyi_net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: zunyi_backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      FLASK_DEBUG: ${FLASK_DEBUG:-False}
+      SECRET_KEY: ${SECRET_KEY}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-20}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH:-8388608}
+      MAX_IMAGE_UPLOAD_BYTES: ${MAX_IMAGE_UPLOAD_BYTES:-5242880}
+      UPLOAD_ROOT: /app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zunyi_net
+    volumes:
+      - upload_data:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: zunyi_frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/public/img:/usr/share/nginx/html/img:ro
+    networks:
+      - zunyi_net
+
+volumes:
+  db_data:
+  upload_data:
+
+networks:
+  zunyi_net:
+    driver: bridge

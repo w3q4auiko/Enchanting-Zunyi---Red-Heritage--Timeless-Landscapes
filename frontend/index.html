@@ -1,0 +1,85 @@
+﻿<!doctype html>
+<!--
+  Module: Frontend Entry Shell
+  Description: 遵义旅游信息系统的前端应用壳层，负责承载 SPA 挂载点与首屏元信息。
+  Architecture: 静态壳层与运行时应用解耦，地图服务通过反向代理实现密钥隔离。
+-->
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="/logo-mark-v2.png" rel="icon" type="image/png" />
+    <link href="/logo-mark-v2.png" rel="apple-touch-icon" />
+    <meta name="theme-color" content="#c8102e" />
+    <meta name="robots" content="index,follow" />
+    <meta
+      name="description"
+      content="本系统为毕业设计成果，构建于 Flask 与 Vue 技术栈之上，旨在实现遵义旅游信息的综合展示与文化传播。系统严格遵循软件工程规范，紧扣 “可视化呈现、精准化定位、链路化服务、持久化传播” 四大核心目标，成功实现了对遵义地区红色文化地标、自然生态资源及区域旅游攻略的一体化信息集成。系统的最终目标是为全域旅游的科学决策与高效管理提供强有力的数字化支撑。"
+    />
+    <meta
+      name="keywords"
+      content="遵义旅游,红色文化,遵义会议,旅游攻略,景点,美食,路线,贵州旅行"
+    />
+    <link rel="canonical" href="https://zuimeizy.city/" />
+    <meta property="og:title" content="醉美遵义 · 山河红韵" />
+    <meta
+      property="og:description"
+      content="遵义红色文化、自然风光与城市人文的数字化导览平台，提供景点、美食、路线与区域信息的综合展示。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://zuimeizy.city/" />
+    <meta property="og:image" content="https://zuimeizy.city/img/Overview.webp" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="醉美遵义 · 山河红韵" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="醉美遵义 · 山河红韵" />
+    <meta
+      name="twitter:description"
+      content="遵义红色文化、自然风光与城市人文的数字化导览平台，提供景点、美食、路线与区域信息的综合展示。"
+    />
+    <meta
+      name="twitter:image"
+      content="https://zuimeizy.city/img/Overview.webp"
+    />
+    <title>醉美遵义 · 山河红韵</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap"
+      rel="stylesheet"
+    />
+    <script type="text/javascript">
+      /**
+       * @description 高德地图 Web API 安全配置基线。
+       * 机制说明：通过反向代理转发模式隔离客户端与私有鉴权密钥，降低泄露风险。
+       * 业务价值：保证地图与位置服务在旅游信息系统中的稳定可用与安全合规。
+       * @returns {void}
+       */
+      window._AMapSecurityConfig = {
+        serviceHost: "/_AMapService",
+      };
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "醉美遵义 · 山河红韵",
+        "url": "https://zuimeizy.city/",
+        "description": "遵义红色文化、自然风光与城市人文的数字化导览平台，提供景点、美食、路线与区域信息的综合展示。",
+        "inLanguage": "zh-CN",
+        "publisher": {
+          "@type": "Organization",
+          "name": "醉美遵义 · 山河红韵",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://zuimeizy.city/logo-mark-v2.png"
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="/src/main.js" type="module"></script>
+  </body>
+</html>

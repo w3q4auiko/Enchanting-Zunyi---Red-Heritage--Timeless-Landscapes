@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    {% set seo_title = seo_title|default("醉美遵义 · 山河红韵") %}
+    {% set seo_description = seo_description|default("遵义红色文化、自然风光与城市人文的数字化导览平台，提供景点、美食、路线与区域信息的综合展示。") %}
+    {% set seo_keywords = seo_keywords|default("遵义旅游,红色文化,旅游攻略,景点,美食,路线,遵义会议") %}
+    {% set seo_image = seo_image|default((config.SITE_URL or request.url_root) ~ "img/Overview.webp") %}
+    {% set canonical_url = canonical_url|default(config.SITE_URL or request.url_root) %}
+
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description }}" />
+    <meta name="keywords" content="{{ seo_keywords }}" />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#c8102e" />
+    <link rel="canonical" href="{{ canonical_url }}" />
+
+    <meta property="og:title" content="{{ seo_title }}" />
+    <meta property="og:description" content="{{ seo_description }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ canonical_url }}" />
+    <meta property="og:image" content="{{ seo_image }}" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content="醉美遵义 · 山河红韵" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ seo_title }}" />
+    <meta name="twitter:description" content="{{ seo_description }}" />
+    <meta name="twitter:image" content="{{ seo_image }}" />
+
+    {% set structured_data = structured_data|default({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "醉美遵义 · 山河红韵",
+      "url": canonical_url,
+      "description": seo_description,
+      "inLanguage": "zh-CN",
+      "publisher": {
+        "@type": "Organization",
+        "name": "醉美遵义 · 山河红韵",
+        "logo": {
+          "@type": "ImageObject",
+          "url": (config.SITE_URL or request.url_root) ~ "img/logo.png"
+        }
+      }
+    }) %}
+    <script type="application/ld+json">
+      {{ structured_data | tojson }}
+    </script>
+
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    {% block body %}{% endblock %}
+  </body>
+</html>
